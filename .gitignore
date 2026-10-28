@@ -1,0 +1,20 @@
+﻿# Datos crudos y resultados pesados
+ds005366/
+ds005366_subset/
+derivatives_unidad3/**
+!derivatives_unidad3/
+!derivatives_unidad3/**/
+!derivatives_unidad3/**/*.csv
+!derivatives_unidad3/**/*.png
+
+# Imagenes y transformaciones
+*.nii
+*.nii.gz
+*.mat
+*.part
+*.part.gz
+
+# Entornos y temporales
+.venv/
+__pycache__/
+.ipynb_checkpoints/
