@@ -104,22 +104,19 @@ SMOOTHING_FWHM = None         # Los datos ya fueron suavizados a 6 mm en el prep
 FDR_ALPHA     = 0.05          # Corrección por tasa de falsos descubrimientos (q < 0.05)
 CLUSTER_TH    = 10            # Tamaño mínimo de clúster espacial k >= 10 vóxeles
 
-# Selección de los 10 sujetos: 5 Controles Sanos y 5 Pacientes con Epilepsia
-# Balanceados por sexo y seleccionados con bajo movimiento relativo dentro de su grupo
-COHORTE_10 = [
-    # --- 5 Controles Sanos ---
-    "sub-083",  # M, 25 años, TR 2.5s, NVol 120
-    "sub-084",  # M, 20 años, TR 2.5s, NVol 120
-    "sub-118",  # F, 20 años, TR 2.5s, NVol 120
-    "sub-111",  # F, 30 años, TR 2.5s, NVol 120
-    "sub-132",  # M, 44 años, TR 2.5s, NVol 120 (menor FD de toda la cohorte)
-    # --- 5 Pacientes con Epilepsia ---
-    "sub-019",  # F, 14 años, TR 1.85s, NVol 145
-    "sub-076",  # M, 25 años, TR 1.85s, NVol 145
-    "sub-069",  # M, 22 años, TR 0.61s, NVol 442 (menor FD entre epilepsia PRESTO)
-    "sub-022",  # F, 42 años, TR 0.61s, NVol 442
-    "sub-020",  # F, 15 años, TR 0.61s, NVol 442
-]
+# Lista de sujetos a procesar.
+# Se construye dinámicamente: todos los sujetos del CSV que aún no tienen el mapa FDR.
+# Los sanos (TR 2.5s) se procesan primero (más rápidos), luego epilepsia PRESTO.
+def _build_pending_list(csv_path: Path, glm_dir_path: Path) -> list:
+    _df = pd.read_csv(csv_path)
+    _procesados = {
+        p.name for p in glm_dir_path.iterdir()
+        if p.is_dir() and (p / f"{p.name}_task-Motor2Class_desc-fdr05_statmap.nii.gz").exists()
+    } if glm_dir_path.exists() else set()
+    _pendientes = _df[~_df["sub"].isin(_procesados)].sort_values(["TR", "NVol"], ascending=[False, True])
+    return _pendientes["sub"].tolist()
+
+COHORTE_PENDIENTES = _build_pending_list(CSV_SUJETOS, GLM_DIR)
 
 # ==============================================================================
 # FUNCIÓN DE PRIMER NIVEL POR SUJETO
@@ -227,7 +224,7 @@ def procesar_primer_nivel(sub_id: str, df_meta: pd.DataFrame, sobrescribir: bool
         noise_model=NOISE_MODEL,
         standardize=False,
         minimize_memory=True,
-        n_jobs=2,
+        n_jobs=1 if n_vol >= 450 else 2,
         verbose=0,
     )
 
@@ -333,15 +330,25 @@ def procesar_primer_nivel(sub_id: str, df_meta: pd.DataFrame, sobrescribir: bool
 # ==============================================================================
 
 def main():
-    print("=" * 70)
-    print(" INICIANDO ANÁLISIS DE PRIMER NIVEL fMRI - COHORTE DE 10 SUJETOS")
-    print(f" 5 Controles Sanos y 5 Pacientes con Epilepsia")
-    print("=" * 70)
-
     df_meta = pd.read_csv(CSV_SUJETOS)
+
+    # Calcular lista de pendientes en tiempo de ejecución
+    cohorte = _build_pending_list(CSV_SUJETOS, GLM_DIR)
+
+    print("=" * 70)
+    print(f" ANÁLISIS DE PRIMER NIVEL fMRI — {len(cohorte)} SUJETOS PENDIENTES")
+    print("=" * 70)
+    if not cohorte:
+        print("[INFO] Todos los sujetos ya están procesados. Nada que hacer.")
+        return
+
+    for sub_id in cohorte:
+        print(f"\n  -> Siguiente: {sub_id}")
+
+    print()
     resultados = []
 
-    for sub_id in COHORTE_10:
+    for sub_id in cohorte:
         try:
             res = procesar_primer_nivel(sub_id, df_meta, sobrescribir=False)
             resultados.append(res)
@@ -360,43 +367,60 @@ def main():
                 "tiempo_s": 0.0,
                 "estado": f"ERROR: {e}",
             })
+        finally:
+            gc.collect()
+            # Guardar log progresivo después de cada sujeto
+            pd.DataFrame(resultados).to_csv(GLM_DIR / "glm_log_completo.csv", index=False)
 
-    # Guardar resumen en CSV
+    # Resumen final
     df_res = pd.DataFrame(resultados)
-    resumen_path = GLM_DIR / "resumen_primer_nivel_cohorte10.csv"
-    df_res.to_csv(resumen_path, index=False)
     print("\n" + "=" * 70)
-    print(" RESUMEN ESTADÍSTICO DE PRIMER NIVEL (COHORTE DE 10 SUJETOS)")
+    print(" RESUMEN ESTADÍSTICO DE PRIMER NIVEL (LOTE ACTUAL)")
     print("=" * 70)
-    print(df_res[["sub", "grupo", "sex", "age", "z_max", "umbral_fdr", "voxeles_fdr_sig", "estado"]])
+    print(df_res[["sub", "grupo", "sex", "age", "z_max", "umbral_fdr", "voxeles_fdr_sig", "tiempo_s", "estado"]].to_string(index=False))
     print("\n[PROMEDIOS POR GRUPO]")
-    print(df_res.groupby("grupo")[["z_max", "voxeles_fdr_sig"]].describe().T)
+    validos = df_res[df_res["estado"] == "ok"]
+    if not validos.empty:
+        print(validos.groupby("grupo")[["z_max", "voxeles_fdr_sig"]].mean().round(1))
 
-    # ==============================================================================
-    # FIGURA COMPARATIVA MULTI-SUJETO: CONTROLES SANOS VS. PACIENTES CON EPILEPSIA
-    # ==============================================================================
-    print("\n[INFO] Generando figura comparativa de mapas de activación FDR...")
+    # Resumen acumulado de TODOS los sujetos procesados hasta ahora
+    log_total_path = GLM_DIR / "glm_log_completo.csv"
+    if log_total_path.exists():
+        df_total = pd.read_csv(log_total_path)
+        df_total.to_csv(log_total_path, index=False)
+
+    # Figura comparativa de todos los sujetos procesados
+    subs_con_fdr = sorted([
+        p.name for p in GLM_DIR.iterdir()
+        if p.is_dir() and (p / f"{p.name}_zmap_fdr.png").exists()
+    ])
+    print(f"\n[INFO] Generando figura comparativa con {len(subs_con_fdr)} sujetos procesados...")
     try:
         import matplotlib.image as mpimg
-        fig, axes = plt.subplots(len(COHORTE_10), 1, figsize=(14, 2.8 * len(COHORTE_10)))
-        for idx, sub_id in enumerate(COHORTE_10):
-            ax = axes[idx]
+        fig, axes = plt.subplots(len(subs_con_fdr), 1, figsize=(14, 2.6 * len(subs_con_fdr)))
+        if len(subs_con_fdr) == 1:
+            axes = [axes]
+        for ax, sub_id in zip(axes, subs_con_fdr):
             f_png_fdr = GLM_DIR / sub_id / f"{sub_id}_zmap_fdr.png"
+            r = df_meta[df_meta["sub"] == sub_id]
+            label = f"{sub_id} [{r['grupo'].iloc[0].upper()}] {r['sex'].iloc[0]}, {r['age'].iloc[0]}a" if not r.empty else sub_id
             if f_png_fdr.exists():
                 img_arr = mpimg.imread(str(f_png_fdr))
                 ax.imshow(img_arr)
-                ax.axis("off")
             else:
-                ax.text(0.5, 0.5, f"{sub_id}: No disponible", ha="center", va="center")
-                ax.axis("off")
+                ax.text(0.5, 0.5, f"{sub_id}: No disponible", ha="center", va="center", transform=ax.transAxes)
+            ax.set_ylabel(label, fontsize=7, rotation=0, labelpad=130, va="center")
+            ax.axis("off")
         fig.tight_layout()
-        fig_comp_path = GLM_DIR / "comparativa_primer_nivel_sanos_vs_epilepsia.png"
-        fig.savefig(fig_comp_path, dpi=120)
+        fig_comp_path = GLM_DIR / "comparativa_primer_nivel_todos.png"
+        fig.savefig(fig_comp_path, dpi=100, bbox_inches="tight")
         plt.close(fig)
         print(f"[INFO] Figura comparativa guardada en: {fig_comp_path}")
     except Exception as e:
         print(f"[Aviso] No se pudo generar la figura compuesta: {e}")
+
     print("\n[SUCCESS] Procesamiento de primer nivel finalizado exitosamente.")
+
 
 if __name__ == "__main__":
     main()
