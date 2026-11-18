@@ -1,0 +1,34 @@
+ANALISIS DE SEGUNDO NIVEL - Mapeo motor de la mano derecha (ds005366, tarea Motor2Class)
+30 sanos y 16 pacientes con epilepsia. Entradas: mapas de efecto (beta, % de cambio de senal) del
+primer nivel y mascara de cobertura por grupo. Modelo: grupo + edad + sexo (42 grados de libertad).
+
+scripts/
+  segundo_nivel.py   Modelo de grupo, umbrales (FDR, Bonferroni), permutaciones y regiones de interes.
+                     Uso: python segundo_nivel.py <glm_primer_nivel> <mascara.nii.gz> <salida> [n_perm]
+  figuras.py         Figuras del informe, tablas de picos con atlas y analisis de sensibilidad.
+
+resultados/  (mapas en espacio MNI152 de 2 mm; se abren con FSLeyes, MRIcroGL o nilearn)
+  media_sanos_*            Actividad promedio de los sanos:
+  media_epilepsia_*        y de los pacientes. Para cada uno:
+      _z.nii.gz                mapa Z sin umbral
+      _efecto.nii.gz           mapa de efecto (beta medio, % de senal)
+      _z_fdr.nii.gz            mapa Z con FDR q<0,05 y k>=20
+      _z_bonferroni.nii.gz     mapa Z con Bonferroni p<0,05
+      _clusters_fdr.csv        conglomerados del mapa FDR
+      _picos_bonferroni.csv    maximos locales (Z>4,96) con etiquetas AAL y Harvard-Oxford (Tabla III)
+  sanos_menos_epilepsia_*  Diferencia entre grupos (mismos archivos), mas:
+      _neglog10p_fwe_perm.nii.gz   -log10(p corregido) por 5000 permutaciones
+      _picos_sin_corregir.csv      focos con |Z|>3,1 sin corregir (exploratorio)
+  resumen_segundo_nivel.csv        vóxeles significativos y umbrales por contraste
+  matriz_diseno_segundo_nivel.csv  matriz de diseno usada
+  roi_por_sujeto.csv               efecto por sujeto en M1 izq., M1 der., SMA e indice de lateralidad,
+                                   junto con edad, sexo, lateralidad, TR, FD y datos del primer nivel
+  roi_estadisticas.csv             comparacion entre grupos por region (Tabla IV)
+  sensibilidad.csv                 analisis de sensibilidad (Tabla V)
+  tabla_46_sujetos.csv             datos por sujeto del apendice (Tabla VII)
+  mascara_interseccion_46.nii.gz   voxeles con datos en los 46 sujetos
+  intensidad_media_sujetos.csv     intensidad media cruda por sujeto (aportada por Paulina)
+
+figuras/  Figuras del informe en alta resolucion
+  fig_seleccion (Fig. 1), fig_fd (Fig. 2), fig_movimiento (Fig. 3), fig_qc (Fig. 4),
+  fig_cobertura (Fig. 5), fig_primer_nivel (Fig. 6), fig_grupo (Fig. 7), fig_roi (Fig. 8)

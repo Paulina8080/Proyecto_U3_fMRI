@@ -1,0 +1,12 @@
+Cluster ID,X,Y,Z,Peak Stat,Cluster Size (mm3),AAL,Harvard_Oxford
+1,-20.0,-10.0,0.0,6.578363518421504,1232.0,-,Left_Pallidum 93%
+2,0.0,0.0,64.0,6.135693841968248,3680.0,Supp_Motor_Area_L,Left_Juxtapositional_Lobule_Cortex_(formerly_Supplementary_Motor_Cortex) 50%; Right_Juxtapositional_Lobule_Cortex_(formerly_Supplementary_Motor_Cortex) 11%
+2a,-8.0,8.0,44.0,5.725361704092037,,Supp_Motor_Area_L,Left_Paracingulate_Gyrus 30%; Left_Cingulate_Gyrus_anterior_division 20%
+2b,-12.0,-6.0,62.0,5.59104457267672,,Supp_Motor_Area_L,Left_Superior_Frontal_Gyrus 19%; Left_Juxtapositional_Lobule_Cortex_(formerly_Supplementary_Motor_Cortex) 3%
+3,36.0,-6.0,54.0,5.804133254732059,368.0,Precentral_R,Right_Precentral_Gyrus 45%; Right_Middle_Frontal_Gyrus 17%
+4,6.0,-60.0,-24.0,5.770787331268459,1216.0,Vermis_6,
+5,50.0,4.0,8.0,5.688645767750324,424.0,Rolandic_Oper_R,Right_Central_Opercular_Cortex 26%; Right_Precentral_Gyrus 12%
+6,62.0,-22.0,28.0,5.422786553586534,280.0,SupraMarginal_R,Right_Supramarginal_Gyrus_anterior_division 51%; Right_Postcentral_Gyrus 15%
+7,-50.0,8.0,-2.0,5.376605151320236,232.0,Temporal_Pole_Sup_L,Left_Central_Opercular_Cortex 23%; Left_Frontal_Operculum_Cortex 19%
+8,58.0,-28.0,46.0,5.305968718792056,184.0,SupraMarginal_R,Right_Supramarginal_Gyrus_anterior_division 71%; Right_Postcentral_Gyrus 4%
+9,42.0,0.0,6.0,5.263797232108998,120.0,Insula_R,Right_Insular_Cortex 66%; Right_Central_Opercular_Cortex 18%

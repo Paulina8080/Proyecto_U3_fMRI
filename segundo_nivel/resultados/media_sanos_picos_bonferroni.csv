@@ -1,0 +1,23 @@
+Cluster ID,X,Y,Z,Peak Stat,Cluster Size (mm3),AAL,Harvard_Oxford
+1,-46.0,-22.0,56.0,9.05881059807528,8704.0,Postcentral_L,Left_Postcentral_Gyrus 57%; Left_Precentral_Gyrus 3%
+1a,-56.0,-24.0,38.0,6.0265955380081815,,Parietal_Inf_L,Left_Postcentral_Gyrus 34%; Left_Supramarginal_Gyrus_anterior_division 31%
+2,6.0,-60.0,-22.0,7.974616881820453,14256.0,Vermis_6,
+2a,32.0,-56.0,-26.0,7.859868047292439,,Cerebelum_6_R,
+2b,4.0,-62.0,-16.0,7.572583653480927,,Vermis_6,
+2c,40.0,-70.0,-16.0,5.478604518224075,,Occipital_Inf_R,Right_Occipital_Fusiform_Gyrus 38%; Right_Lateral_Occipital_Cortex_inferior_division 36%
+3,-2.0,-2.0,60.0,7.882616169378073,7320.0,Supp_Motor_Area_L,Left_Juxtapositional_Lobule_Cortex_(formerly_Supplementary_Motor_Cortex) 84%
+4,-18.0,-18.0,2.0,7.787871285655675,10808.0,Thalamus_L,Left_Thalamus 35%
+4a,-14.0,-2.0,14.0,5.887570355563288,,-,Left_Caudate 14%; Left_Thalamus 7%
+5,-30.0,-60.0,-24.0,7.011638714064649,3208.0,Cerebelum_6_L,
+6,-46.0,0.0,10.0,6.589836437980308,1288.0,Rolandic_Oper_L,Left_Central_Opercular_Cortex 59%; Left_Precentral_Gyrus 1%
+7,62.0,-16.0,30.0,6.163317758448367,480.0,Postcentral_R,Right_Postcentral_Gyrus 60%; Right_Supramarginal_Gyrus_anterior_division 17%
+8,24.0,6.0,4.0,6.160225410528678,920.0,Putamen_R,Right_Putamen 100%
+9,32.0,-88.0,2.0,5.927148124144454,376.0,Occipital_Mid_R,Right_Lateral_Occipital_Cortex_inferior_division 29%; Right_Occipital_Pole 22%
+10,52.0,-32.0,46.0,5.883099096485388,1312.0,SupraMarginal_R,Right_Supramarginal_Gyrus_anterior_division 44%; Right_Supramarginal_Gyrus_posterior_division 10%
+11,-58.0,-16.0,14.0,5.746266924823027,888.0,Postcentral_L,Left_Central_Opercular_Cortex 63%; Left_Planum_Temporale 8%
+12,36.0,-8.0,54.0,5.689330176889823,504.0,Precentral_R,Right_Precentral_Gyrus 40%; Right_Middle_Frontal_Gyrus 9%
+13,64.0,-40.0,10.0,5.590472302696934,120.0,Temporal_Mid_R,Right_Supramarginal_Gyrus_posterior_division 45%; Right_Middle_Temporal_Gyrus_temporooccipital_part 18%
+14,-52.0,-38.0,24.0,5.440347096167118,168.0,SupraMarginal_L,Left_Parietal_Operculum_Cortex 48%; Left_Planum_Temporale 18%
+15,52.0,8.0,12.0,5.403150929518639,80.0,Frontal_Inf_Oper_R,Right_Inferior_Frontal_Gyrus_pars_opercularis 33%; Right_Precentral_Gyrus 27%
+16,12.0,-16.0,0.0,5.383568811492256,184.0,Thalamus_R,Right_Thalamus 84%
+17,46.0,2.0,4.0,5.282643669652112,112.0,Insula_R,Right_Central_Opercular_Cortex 71%; Right_Insular_Cortex 12%
